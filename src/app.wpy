@@ -1,0 +1,218 @@
+<style lang="less">
+</style>
+
+<script>
+import wepy from 'wepy';
+import 'wepy-async-function';
+import '@/baseAPI.js';
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/tabs/home',
+      'pages/tabs/cates',
+      'pages/tabs/search',
+      'pages/tabs/cart',
+      'pages/tabs/my',
+      'pages/goods_detail/main',
+      'pages/goods_list',
+      'pages/order',
+      'pages/orderlist'
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#d81e06',
+      navigationBarTitleText: '黑马优购',
+      navigationBarTextStyle: 'white'
+    },
+    tabBar: {
+      selectedColor: '#d81e06',
+      list: [
+        {
+          pagePath: 'pages/tabs/home',
+          text: '首页',
+          iconPath: '/assets/icons/home.png',
+          selectedIconPath: '/assets/icons/home-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/cates',
+          text: '分类',
+          iconPath: '/assets/icons/cates.png',
+          selectedIconPath: '/assets/icons/cates-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/search',
+          text: '搜索',
+          iconPath: '/assets/icons/search.png',
+          selectedIconPath: '/assets/icons/search-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/cart',
+          text: '购物车',
+          iconPath: '/assets/icons/cart.png',
+          selectedIconPath: '/assets/icons/cart-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/my',
+          text: '我的',
+          iconPath: '/assets/icons/my.png',
+          selectedIconPath: '/assets/icons/my-active.png'
+        }
+      ]
+    },
+    usingComponents: {
+      'van-badge': './assets/vant/badge/index',
+      'van-badge-group': './assets/vant/badge-group/index',
+      'van-row': './assets/vant/row/index',
+      'van-col': './assets/vant/col/index',
+      "van-search": "./assets/vant/search/index",
+      "van-cell": "./assets/vant/cell/index",
+  "van-cell-group": "./assets/vant/cell-group/index",
+   "van-icon": "./assets/vant/icon/index",
+   "van-tag": "./assets/vant/tag/index",
+   "van-card": "./assets/vant/card/index",
+   "van-tab": "./assets/vant/tab/index",
+  "van-tabs": "./assets/vant/tabs/index",
+  "wxparse": "./assets/wxparse/wxparse",
+  "van-goods-action": "./assets/vant/goods-action/index",
+  "van-goods-action-icon": "./assets/vant/goods-action-icon/index",
+  "van-goods-action-button": "./assets/vant/goods-action-button/index",
+  "van-cell": "./assets/vant/cell/index",
+  "van-stepper": "./assets/vant/stepper/index",
+  "van-checkbox": "./assets/vant/checkbox/index",
+  "van-swipe-cell": "./assets/vant/swipe-cell/index",
+  "van-submit-bar": "./assets/vant/submit-bar/index",
+  "van-button": "./assets/vant/button/index",
+  "van-tab": "./assets/vant/tab/index",
+  "van-tabs": "./assets/vant/tabs/index",
+  "van-panel": "./assets/vant/panel/index"
+    }
+  };
+
+  // 全局共享数据
+  globalData = {
+    cart: [],
+    total: 0
+  };
+
+  // 添加商品到购物车
+  addToCarts (goods) {
+    var i = this.globalData.cart.findIndex(x=>{
+      return x.id == goods.goods_id
+    })
+
+    if(i!==-1){
+      this.globalData.cart[i].count++
+      this.saveCart()
+      return
+    }
+
+    var info = {
+      id: goods.goods_id,
+      count: 1,
+      name: goods.goods_name,
+      pic: goods.goods_small_logo,
+      price: goods.goods_price,
+      icCheck: true
+    }
+    this.globalData.cart.push(info)
+    this.saveCart()
+  }
+
+  // 根据id更新cart中count的值
+  updateCount (id,count) {
+    var i = this.globalData.cart.findIndex(x=>{
+      return x.id == id
+    })
+    this.globalData.cart[i].count = count
+    this.saveCart()
+  }
+  // 根据id更新isCheck的值
+  updateIsCheck (id,status) {
+    var i = this.globalData.cart.findIndex(x=>x.id ==id)
+    this.globalData.cart[i].icCheck = status
+    this.saveCart()
+  }
+  // 实现全选和反选
+  isFull (status) {
+    this.globalData.cart.forEach(item=>{
+      item.icCheck = status
+    })
+    this.saveCart()
+  }
+
+  // 根据id删除制定商品
+  removeGlobalCart (id) {
+    var i = this.globalData.cart.findIndex(x=>x.id ==id)
+    if(i !== -1) {
+      this.globalData.cart.splice(i,1)
+      this.saveCart()
+    }
+    
+  }
+
+  // 将cart数据存储到本地
+  saveCart () {
+    wepy.setStorageSync('cart',this.globalData.cart)
+    this.renderGoodsCount()
+  }
+
+
+  constructor() {
+    super();
+    this.use('requestfix');
+    this.use('promisify');
+    // 拦截request请求
+    this.intercept('request', {
+      // 发出请求时的回调函数
+      config(p) {
+        wepy.showLoading({
+          title: '获取数据中....'
+        });
+        // 必须返回OBJECT参数对象，否则无法发送请求到服务端
+        p.header = {
+          Authorization: wepy.getStorageSync('token')
+        }
+        return p;
+      },
+
+      // 请求成功后的回调函数
+      success(p) {
+        return p;
+      },
+
+      //请求失败后的回调函数
+      fail(p) {
+        return p;
+      },
+
+      // 请求完成时的回调函数(请求成功或失败都会被执行)
+      complete(p) {
+        wepy.hideLoading();
+        console.log('request complete: ', p);
+      }
+    });
+  }
+
+  // 计算已勾选商品的数量
+  renderGoodsCount () {
+    var total = 0
+    this.globalData.cart.forEach(item=>{
+      if(item.icCheck){
+        total+=item.count
+      }
+    })
+    this.globalData.total = total
+    wepy.setTabBarBadge({
+      index: 3,
+      text: total+''
+    }).catch(err=>err)
+  }
+
+  onLaunch() {
+    console.log('小程序启动了');
+    this.globalData.cart = wepy.getStorageSync('cart') || []
+    this.renderGoodsCount()
+  }
+}
+</script>

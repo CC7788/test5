@@ -1,0 +1,48 @@
+<template>
+  <view class="order_list">
+    <van-tabs active="{{ active }}" bind:change="onTbasChange">
+      <van-tab title="全部">
+        <repeat for="{{allOrderList}}" key="index">
+          <order-item :order="item"></order-item>
+        </repeat>
+      </van-tab>
+      <van-tab title="代付款">
+        <repeat for="{{waitOrdetList}}" key="index">
+          <order-item :order="item"></order-item>
+        </repeat>
+      </van-tab>
+      <van-tab title="已付款">
+        <repeat for="{{finishOrderList}}" key="index">
+          <order-item :order="item"></order-item>
+        </repeat>
+      </van-tab>
+    </van-tabs>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import mixOrderList from '@/mixins/orderlist'
+import orderItem from '@/components/orderItem'
+export default class extends wepy.page {
+  config = {
+    navigationBarTitleText: '订单列表',
+  }
+
+  components = {
+    'order-item':orderItem
+  }
+
+  mixins = [mixOrderList]
+}
+
+</script>
+
+<style lang='less'>
+.line{
+  border: 3px solid #ccc;
+}
+.van-card{
+  border-bottom:3px solid #ccc;
+}
+</style>

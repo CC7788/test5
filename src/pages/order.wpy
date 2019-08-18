@@ -1,0 +1,83 @@
+<template>
+  <view class="order">
+    <!-- 选择收货地址 -->
+    <view wx:if="{{isChooseAddress}}" class="chooseAddress">
+      <van-button type="info" @tap="chooseAddress" size="small">+ 请选择收获地址</van-button>
+    </view>
+    <view wx:else class="addressInfo">
+      <view class="box1">
+        <text>收货人：{{addressInfo.userName}}</text>
+        <view @tap="chooseAddress">
+          <text>联系电话：{{addressInfo.telNumber}}</text>
+          <van-icon name="arrow" />
+        </view>
+      </view>
+      <view class="box2">
+        收货地址：{{addressStr}}
+      </view>
+    </view>
+    <!-- 分割线 -->
+    <image class="line" src="../assets/cart_border@2x.png" />
+    <van-card
+      wx:for="{{carts}}"
+      wx:key="id"
+      num="{{item.count}}"
+      price="{{item.price}}"
+      title="{{item.name}}"
+      thumb="{{item.pic}}"
+    />
+    <van-button wx:if="{{!isLogin}}" size="large" type="primary" open-type="getUserInfo" bindgetuserinfo="getuser" class="loginBtn">登录后下单</van-button>
+
+    <van-submit-bar
+      wx:else
+      price="{{ total }}"
+      button-text="提交订单"
+      bind:submit="onSubmit"
+    />
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import mixOrder from '@/mixins/order'
+export default class extends wepy.page {
+  config = {
+    navigationBarTitleText: '确认订单'
+  }
+
+  mixins = [mixOrder]
+}
+
+</script>
+
+<style lang='less'>
+.order {
+  padding-bottom: 50px;
+  .chooseAddress {
+    text-align: center;
+    padding: 70rpx 0;
+  }
+  .line{
+    height:7px;
+    display: block;
+    width:100%;
+  }
+}
+.addressInfo {
+  font-size: 26rpx;
+  padding: 30rpx 25rpx;
+  .box1{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30rpx;
+  }
+}
+.van-card {
+  border-bottom:1px solid red;
+}
+.loginBtn{
+  position: fixed;
+  bottom:0;
+  width:100%;
+}
+</style>

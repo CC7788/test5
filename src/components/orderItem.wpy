@@ -1,0 +1,41 @@
+<template>
+  <view>
+    <view class="line"></view>
+    <van-panel title="订单号{{order.order_number}}">
+      <block wx:for="{{order.order_detail}}" wx:key="index">
+        <van-card
+          num="{{item.count}}"
+          price="{{item.price}}"
+          title="{{item.name}}"
+          thumb="{{item.pic}}"
+        />
+      </block>
+      <van-cell value="共计{{order.total_count}}件商品，总价￥{{order.total_price}}元" />
+    </van-panel>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class extends wepy.component {
+  config = {
+
+  }
+  props = {
+    order: Object
+  }
+
+  data = {
+
+  }
+
+  methods = {
+
+  }
+}
+
+</script>
+
+<style lang='less'>
+
+</style>

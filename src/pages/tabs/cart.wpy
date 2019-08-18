@@ -1,0 +1,110 @@
+<template>
+  <view class="carts">
+    <!-- 购物车为空 -->
+    <view wx:if="{{isShowEmpty}}" class="empty_carts">
+      <image src="/assets/empty_carts.png" />
+      <view>哎呀，购物车空空的啊</view>
+    </view>
+    <!-- 购物车列表 -->
+    <view wx:else class="cart_box">
+      <van-cell title="购物车列表" icon="shop-o" />
+      <van-swipe-cell wx:for="{{cart}}"
+          wx:key="id" right-width="{{ 65 }}" left-width="{{ 0.01 }}">
+        <van-card
+          title="{{item.name}}"
+        >
+          <view slot="desc" class="desc">
+            <view class="price">￥{{item.price}}</view>
+            <van-stepper value="{{ item.count }}" bind:change="onChangeStepper" data-id="{{item.id}}" />
+          </view>
+          <view slot="thumb" class="thumb">
+            <van-checkbox data-id="{{item.id}}" @change="statusChange" value="{{ item.icCheck }}"></van-checkbox>
+            <image src="{{item.pic}}" />
+          </view>
+        </van-card>
+        <view slot="right" @tap="removeCart({{item.id}})" class="remove">删除</view>
+      </van-swipe-cell>
+      <van-submit-bar
+        price="{{ amount }}"
+        button-text="提交订单"
+        bind:submit="onClickButton"
+        tip="{{ false }}"
+      >
+        <van-checkbox class="fullCheck" value="{{isFull}}" bind:change="onFullChange">全选</van-checkbox>
+      </van-submit-bar>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import mixCart from '@/mixins/tab/cart'
+export default class extends wepy.page {
+  config = {
+
+  }
+
+  mixins = [mixCart]
+}
+</script>
+
+<style lang='less'>
+.carts {
+  .empty_carts{
+    text-align: center;
+    font-size: 28rpx;
+    color: #999;
+    image {
+      margin: 200rpx 0 30rpx 0;
+      width:150rpx;
+      height:150rpx;
+    }
+  }
+}
+.desc {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  bottom:0;
+  width:100%;
+  .price{
+    color: red;
+    font-size: 26rpx;
+    font-weight:bold;
+  }
+}
+
+.van-card{
+  border-bottom:1px solid #eee;
+}
+
+.thumb {
+  display: flex;
+  align-items: center;
+  width:117px;
+  image{
+    width:90px;
+    height:90px;
+    margin-left: 7px;
+  }
+}
+.van-card__thumb{
+  width:117px !important;
+}
+.remove {
+  width:65px;
+  height:100%;
+  color: #fff;
+  background: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.cart_box {
+  padding-bottom: 50px;
+}
+.fullCheck{
+  margin-left: 15px;
+}
+</style>

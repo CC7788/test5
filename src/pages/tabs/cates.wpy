@@ -1,0 +1,62 @@
+<template>
+  <view class="cates">
+    <scroll-view class="left" scroll-y style="height:{{wh}}px;">
+      <van-badge-group active="{{ active }}" bind:change="onChange">
+        <van-badge title="{{item.cat_name}}" wx:for="{{catesList}}" wx:key="index" />
+      </van-badge-group>
+    </scroll-view>
+    <scroll-view class="right" scroll-y style="height:{{wh}}px;">
+      <block wx:for="{{secondData}}" wx:key="index">
+        <van-row class="second">
+          <van-col span="24">
+            <text class="tit">/ {{item.cat_name}} /</text>
+          </van-col>
+        </van-row>
+        <van-row class="three">
+          <van-col @tap="goGoodsList({{item.cat_id}})" wx:for="{{item.children}}" wx:key="index" span="8">
+            <image src="{{item.cat_icon}}" />
+            <view>{{item.cat_name}}</view>
+          </van-col>
+        </van-row>
+      </block>
+    </scroll-view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import mixCates from '@/mixins/tab/cates.js'
+export default class extends wepy.page {
+  mixins = [mixCates]
+}
+
+</script>
+
+<style lang='less'>
+.cates{
+  display: flex;
+  .left{
+    width: 85px;
+  }
+  .right{
+    .second{
+      margin: 30rpx;
+      text-align: center;
+    }
+    .tit{
+      font-size: 26rpx;
+      font-weight: bold;
+    }
+    .three {
+      text-align: center;
+      image {
+        width:130rpx;
+        height:120rpx;
+      }
+      view{
+        font-size: 26rpx;
+      }
+    }
+  }
+}
+</style>
